@@ -118,7 +118,8 @@ public class BookService {
                 }
                 if (!foundBook) {
                     log.info("No matching book found. Msg got from - " +
-                            updateService.getResult().get(0).getMessage().getFrom().getFirstName());
+                            updateService.getResult().get(0).getMessage().getFrom().getFirstName() + ", ID - " +
+                            updateService.getResult().get(0).getMessage().getChat().getId());
                     dto.setText("Sorry, I couldn't find any book information for the title or author '" + text + "'.");
                     sendMessage(dto);
                 }
