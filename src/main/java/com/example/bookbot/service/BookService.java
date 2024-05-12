@@ -37,7 +37,7 @@ public class BookService {
         if (!updates.getResult().isEmpty()) {
             Integer updateId = updates.getResult().get(updates.getResult().size() - 1).getUpdateId();
             log.info("Message got from - " + updates.getResult().get(0).getMessage().getFrom().getFirstName() + ", ID - "
-            + updates.getResult().get(0).getMessage().getChat().getId());
+                    + updates.getResult().get(0).getMessage().getChat().getId());
             return telegramClient.getUpdates(Long.valueOf(updateId));
         }
         return null;
@@ -80,7 +80,6 @@ public class BookService {
                 coverArtUrl);
     }
 
-
     public RootResponseDto sendInfo() {
         RootRequestDto updateService = getUpdateService();
         if (updateService != null) {
@@ -97,13 +96,36 @@ public class BookService {
                 return sendMessage(dto);
             }
 
+            boolean containsBookWord = text.toLowerCase().contains("book");
+
             if (updates != null && updates.getResults() != null && !updates.getResults().isEmpty()) {
-                Book randomBook = updates.getResults().get(random.nextInt(updates.getResults().size()));
-                dto.setText(formatBookInfo(randomBook));
+                boolean foundBook = false;
+                if (containsBookWord) {
+                    Book randomBook = updates.getResults().get(random.nextInt(updates.getResults().size()));
+                    dto.setText(formatBookInfo(randomBook));
+                    sendMessage(dto);
+                    foundBook = true;
+                } else {
+                    for (Book book : updates.getResults()) {
+                        if (book.getTitle().toLowerCase().contains(text.toLowerCase()) ||
+                                book.getAuthors().stream().anyMatch(author -> author.toLowerCase().contains(text.toLowerCase()))) {
+                            foundBook = true;
+                            dto.setText(formatBookInfo(book));
+                            sendMessage(dto);
+                            break;
+                        }
+                    }
+                }
+                if (!foundBook) {
+                    log.info("No matching book found. Msg got from - " +
+                            updateService.getResult().get(0).getMessage().getFrom().getFirstName());
+                    dto.setText("Sorry, I couldn't find any book information for the title or author '" + text + "'.");
+                    sendMessage(dto);
+                }
             } else {
                 dto.setText("Sorry, no book recommendations available at the moment.");
+                sendMessage(dto);
             }
-            return sendMessage(dto);
         }
         return null;
     }
