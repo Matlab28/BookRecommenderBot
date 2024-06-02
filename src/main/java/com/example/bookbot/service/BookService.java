@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 public class BookService {
     private final TelegramAPIClient telegramClient;
     private final BookAPIClient bookClient;
-    private final String host = "book-finder1.p.rapidapi.com";
-    private final String key = "674678e122mshd00ec5b8f945302p1052bcjsn0ad69ed2af91";
+    private final String host = "YOUR_RAPID_API_HOST";
+    private final String key = "YOUR_RAPID_API_KEY";
     private Random random = new Random();
     private Long lastUpdateId = 0L;
 
